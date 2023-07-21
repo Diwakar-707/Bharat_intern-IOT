@@ -1,1 +1,56 @@
+#include <Wire.h>
+#include <Adafruit_SSD1306.h>
+#include <DHT.h>
+
+#define OLED_RESET  -1
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define DHTPIN 4 // DHT11 connected to GPIO4
+#define DHTTYPE DHT11
+#define MQ7PIN 34 // MQ-7 sensor connected to GPIO34
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+
+  Wire.begin();
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // 0x3C is the OLED I2C address
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+}
+
+void loop() {
+  // Read data from DHT11
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  // Read data from MQ-7 (gas sensor)
+  int mq7Value = analogRead(MQ7PIN);
+
+  // Display data on the OLED
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("DHT11 Sensor:");
+  display.print("Temp: ");
+  display.print(temperature);
+  display.println(" C");
+  display.print("Humidity: ");
+  display.print(humidity);
+  display.println(" %");
+
+  display.println();
+
+  display.print("MQ-7 Sensor:");
+  display.print("Gas Level: ");
+  display.println(mq7Value);
+
+  display.display();
+
+  delay(2000); // You can adjust the delay time as needed
+}
 
