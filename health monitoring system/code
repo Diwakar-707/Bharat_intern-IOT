@@ -1,1 +1,55 @@
+#include <DHT.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+#define DHTPIN 4      // Pin connected to the DHT11 data pin
+#define DHTTYPE DHT11  // DHT sensor type (DHT11 or DHT22)
+#define ONE_WIRE_BUS 5  // Pin connected to the DS18B20 sensor
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+}
+
+void loop() {
+  // Wait a few seconds between measurements
+  delay(2000);
+ sensors.requestTemperatures();
+
+  // Read temperature and humidity from the sensor
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+   // Read temperature in Celsius from the DS18B20 sensor
+  float temperatureCelsius = sensors.getTempCByIndex(0);
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  // Check if the temperature reading is valid
+  if (temperatureCelsius == DEVICE_DISCONNECTED_C) {
+    Serial.println("Error: Unable to read the temperature!");
+  } else {
+    // Display temperature on the Serial Monitor
+    Serial.print("Body Temperature: ");
+    Serial.print(temperatureCelsius);
+    Serial.println(" °C");
+  }
+  
+  // Display temperature and humidity values on the Serial Monitor
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.print(" °C\t");
+
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
+}
+
 
